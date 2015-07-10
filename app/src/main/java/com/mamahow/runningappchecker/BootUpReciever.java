@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.util.Log;
 
 /**
- * Created by tiggly on 6/29/15.
+ * Created by fangyu on 6/29/15.
  */
 
 public class BootUpReciever extends BroadcastReceiver{
