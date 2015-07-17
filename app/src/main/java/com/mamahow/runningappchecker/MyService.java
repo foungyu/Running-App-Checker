@@ -10,6 +10,9 @@ import android.os.AsyncTask;
 import java.util.List;
 import java.net.URL;
 
+import android.app.PendingIntent;
+import android.app.AlarmManager;
+import android.os.SystemClock;
 
 /**
  * Created by fangyu on 6/27/15.
@@ -40,6 +43,20 @@ public class MyService extends Service{
         Log.d(TAG, "onDestroy() executed");
     }
 
+    @Override
+    public void onTaskRemoved(Intent rootIntent){
+        Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
+        restartServiceIntent.setPackage(getPackageName());
+
+        PendingIntent restartServicePendingIntent = PendingIntent.getService(getApplicationContext(), 1, restartServiceIntent, PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmService = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        alarmService.set(
+                AlarmManager.ELAPSED_REALTIME,
+                SystemClock.elapsedRealtime() + 1000,
+                restartServicePendingIntent);
+
+        super.onTaskRemoved(rootIntent);
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -57,6 +74,7 @@ public class MyService extends Service{
     private void _runningChecker() {
         int count = 0;
         while(true){
+            Log.i(TAG, "aaa");
             while(!isRunning()) {
                 count++;
 
@@ -71,7 +89,7 @@ public class MyService extends Service{
             }
             // delay
             try {
-                Thread.sleep(3000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -81,7 +99,7 @@ public class MyService extends Service{
     private boolean isRunning() {
         Context context = getBaseContext();
 
-        //Log.i(TAG, "Checking if app is running");
+        Log.i(TAG, "Checking if app is running");
         ActivityManager activityManager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> services = activityManager.getRunningAppProcesses();
 
